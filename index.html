@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DermaLab - a multiagent skincare system</title>
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "Audiowide", "Helvetica Neue", "serif"]
+          },
+          colors: {
+            primary: "#ee75d2",
+            secondary: "#75d8ee",
+            futuristicDark: "#11071d",
+            futuristicPanel: "#2f2340",
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Google Fonts: Inter + Audiowide -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Audiowide&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- jQuery UI CSS (from official CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css"
+  />
+
+  <!-- Basic meta tags -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Landing page for DermaLab - a multiagent skincare system."
+  />
+  <meta name="keywords" content="Dermalab, Skincare, AI, Multiagent, Landing" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Futuristic / Neon-inspired CSS -->
+  <style>
+    :root {
+      --color-primary: #ee75d2;       /* Pinkish */
+      --color-on-primary: white;
+      --color-secondary: #75d8ee;     /* Bluish */
+      --color-bg: #11071d;           /* Dark background */
+      --color-panel: #2f2340;
+    }
+
+    /* Body background: neon grid style + radial gradient */
+    body {
+      margin: 0;
+      height: 100%;
+      background:
+        radial-gradient(
+          at center,
+          transparent,
+          var(--color-bg) 60%
+        ),
+        /* horizontal "grid" lines repeating */
+        linear-gradient(
+          to right,
+          color-mix(in srgb, var(--color-bg), white 10%) 5%,
+          transparent 5%
+        ) repeat-x 0 0 / 2rem 100%,
+        /* vertical "grid" lines repeating */
+        linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--color-bg), white 10%) 5%,
+          transparent 5%
+        ) repeat-y 0 0 / 100% 2rem,
+        /* fallback gradient */
+        linear-gradient(
+          to bottom,
+          var(--color-bg),
+          black
+        );
+      color: var(--color-primary);
+      font-family: "Inter", "Audiowide", sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      min-height: 600px;
+      max-width: 90vw;
+      box-shadow: 0 0 20rem color-mix(in srgb, var(--color-bg), white 60%);
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      margin: 2rem auto; /* center horizontally */
+    }
+
+    .tabs {
+      overflow: hidden;
+      display: flex;
+      gap: 0.25rem;
+      border-bottom: 0.625rem solid var(--color-panel);
+      background: color-mix(in oklab, var(--color-bg), rgba(255, 255, 255, 0.5) 20%);
+    }
+    .tab {
+      padding: 1rem;
+      width: 10rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      position: relative;
+      user-select: none;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease, background 0.2s ease;
+    }
+    .tab .sub {
+      font-size: 0.5rem;
+    }
+    .tab .title {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 0.875rem;
+    }
+    .tab:before,
+    .tab:after {
+      content: "";
+      background: var(--color-panel);
+      position: absolute;
+      bottom: 0;
+      height: 1rem;
+      width: 1rem;
+      --size: 2rem;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: background 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+    }
+    .tab:before {
+      mask-image: radial-gradient(var(--size) var(--size) at 0 0, transparent 50%, black 50%);
+      left: -1rem;
+    }
+    .tab:after {
+      mask-image: radial-gradient(var(--size) var(--size) at 100% 0, transparent 50%, black 50%);
+      right: -1rem;
+    }
+    .tab:hover {
+      background: #4c3966;
+    }
+    .tab.active {
+      z-index: 111;
+      box-shadow: 0 -0.625rem 0.955rem rgba(0, 0, 0, 0.12);
+      background: var(--color-panel);
+      color: var(--color-secondary);
+      pointer-events: none;
+    }
+    .tab.active:before,
+    .tab.active:after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .content {
+      flex: 1;
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-bg), rgba(255, 255, 255, 0.2) 30%),
+        rgba(0, 0, 0, 0.8)
+      );
+      color: #fff;
+      font-size: 1rem;
+      position: relative;
+      overflow: auto;
+      min-height: 500px;
+    }
+
+    /********** Node-Workflow-Specific Styles **********/
+    #node-workflow {
+      width: 100%;
+      height: 100%;
+      /* Removed min-height, changed overflow to visible */
+      position: relative;
+      overflow: visible;
+      padding-bottom: 1rem;
+    }
+
+    #svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none; /* let clicks pass to nodes */
+    }
+
+    .node {
+      background: linear-gradient(135deg, #2f2340 40%, #11071d);
+      border: 2px solid var(--color-primary);
+      border-radius: 1rem;
+      box-shadow:
+        0 0 4px var(--color-primary),
+        0 0 2px var(--color-primary) inset;
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      position: absolute;
+      font-family: "Inter", sans-serif;
+      font-size: 0.75rem;
+      text-align: center;
+      min-width: 5rem;
+      max-width: 8rem; 
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .node:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 8px var(--color-primary);
+    }
+    .node:before {
+      content: attr(title) " ";
+      display: block;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.7rem;
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .output {
+      position: absolute;
+      left: -0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 2px solid var(--color-secondary);
+      background-color: var(--color-panel);
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      box-shadow: 0 0 4px var(--color-secondary);
+      cursor: pointer;
+    }
+
+    .connection {
+      position: relative;
+      padding-right: 1.3rem;
+      text-align: left;
+      margin: 0.25rem 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.15);
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+    .connection:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+    .connection:after {
+      content: "";
+      position: absolute;
+      right: 0.15rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      border: 2px solid var(--color-secondary);
+      background-color: var(--color-panel);
+      box-shadow: 0 0 4px var(--color-secondary);
+    }
+
+    .node.connected {
+      box-shadow:
+        0 0 6px var(--color-primary),
+        inset 0 0 2px var(--color-primary);
+    }
+
+    #node-workflow path {
+      stroke: var(--color-secondary);
+      stroke-width: 2.5;
+      fill: none;
+      filter: drop-shadow(0 0 4px var(--color-secondary));
+      transition: d 0.2s ease-out;
+    }
+  </style>
+</head>
+
+<body class="overflow-x-hidden">
+  <!-- Navigation / Header -->
+  <header class="sticky top-0 bg-black bg-opacity-75 z-50 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold tracking-wide">
+        Derma<span class="text-primary">Lab</span>
+      </h1>
+      <nav class="space-x-4 text-sm">
+        <a href="#" class="hover:text-secondary transition-colors duration-200">
+          Home
+        </a>
+        <a
+          href="#about"
+          class="hover:text-secondary transition-colors duration-200"
+        >
+          About
+        </a>
+        <a
+          href="#agents"
+          class="hover:text-secondary transition-colors duration-200"
+        >
+          Agents
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section
+    class="relative border-b-4 border-futuristicDark text-white"
+    style="background: rgba(0,0,0,0.4);"
+  >
+    <div
+      class="max-w-5xl mx-auto px-4 py-16 flex flex-col md:flex-row items-center justify-between"
+    >
+      <div class="mb-8 md:mb-0 md:w-1/2">
+        <h2 class="text-4xl md:text-6xl font-bold tracking-wider mb-4">
+          DermaLab
+        </h2>
+        <p class="text-lg md:text-xl mb-6">
+          A multiagent skincare system where
+          <span class="text-primary font-bold">3 AI</span> and
+          <span class="text-secondary font-bold">2 Humans</span>
+          collaborate to bring optimal skincare solutions.
+        </p>
+        <a
+          href="#agents"
+          class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-md shadow-md hover:bg-pink-600 transition-colors"
+        >
+          Meet the Agents
+        </a>
+      </div>
+
+      <!-- A placeholder image or illustration -->
+      <div class="w-full md:w-1/2 flex items-center justify-center">
+        <img
+          src="https://via.placeholder.com/400x300?text=DermaLab+Hero"
+          alt="DermaLab Hero Placeholder"
+          class="rounded-lg shadow-lg border-2 border-gray-800"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- About/Intro Section -->
+  <section id="about" class="max-w-5xl mx-auto px-4 py-16 text-gray-200">
+    <div class="mb-8">
+      <h3 class="text-2xl font-bold mb-2 text-primary">About DermaLab</h3>
+      <p class="leading-relaxed">
+        DermaLab is a research project combining AI and human expertise in the
+        field of skincare. Three specialized AI models consult and process data,
+        while two human dermatologists review, enhance, and deliver personalized
+        skincare recommendations. This ensures that the synergy between
+        artificial and human intelligence leads to top-notch advice.
+      </p>
+    </div>
+
+    <!-- Placeholder for photos -->
+    <div class="flex flex-wrap -mx-2">
+      <div class="w-1/2 sm:w-1/3 lg:w-1/5 px-2 mb-4">
+        <img
+          src="https://via.placeholder.com/200?text=Photo+1"
+          alt="Photo 1"
+          class="w-full h-auto rounded shadow-md border border-gray-700"
+        />
+      </div>
+      <div class="w-1/2 sm:w-1/3 lg:w-1/5 px-2 mb-4">
+        <img
+          src="https://via.placeholder.com/200?text=Photo+2"
+          alt="Photo 2"
+          class="w-full h-auto rounded shadow-md border border-gray-700"
+        />
+      </div>
+      <div class="w-1/2 sm:w-1/3 lg:w-1/5 px-2 mb-4">
+        <img
+          src="https://via.placeholder.com/200?text=Photo+3"
+          alt="Photo 3"
+          class="w-full h-auto rounded shadow-md border border-gray-700"
+        />
+      </div>
+      <div class="w-1/2 sm:w-1/3 lg:w-1/5 px-2 mb-4">
+        <img
+          src="https://via.placeholder.com/200?text=Photo+4"
+          alt="Photo 4"
+          class="w-full h-auto rounded shadow-md border border-gray-700"
+        />
+      </div>
+      <div class="w-1/2 sm:w-1/3 lg:w-1/5 px-2 mb-4">
+        <img
+          src="https://via.placeholder.com/200?text=Photo+5"
+          alt="Photo 5"
+          class="w-full h-auto rounded shadow-md border border-gray-700"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Agents Section -->
+  <section
+    id="agents"
+    class="py-16 border-t border-gray-700 bg-black bg-opacity-40 text-gray-200"
+  >
+    <div class="max-w-5xl mx-auto px-4">
+      <h3 class="text-3xl font-bold mb-8 text-center text-primary">
+        Our 3 AI + 2 Human Experts
+      </h3>
+
+      <div id="container" class="container">
+        <div class="tabs">
+          <div class="tab active">
+            <div class="sub">AI Agents</div>
+            <div class="title">The Trio</div>
+          </div>
+          <div class="tab">
+            <div class="sub">description</div>
+            <div class="title">Human Experts</div>
+          </div>
+          <div class="tab">
+            <div class="sub">description</div>
+            <div class="title">More Info</div>
+          </div>
+        </div>
+        <!-- The content area where we'll load dynamic tab content -->
+        <div class="content"></div>
+      </div>
+
+      <!-- Original “Agents” cards below -->
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-5 gap-6">
+        <!-- AI Agents -->
+        <div
+          class="p-6 bg-[#2f2340] bg-opacity-70 rounded shadow-sm flex flex-col items-center"
+        >
+          <img
+            class="w-16 h-16 rounded-full mb-4 border-2 border-secondary"
+            src="https://via.placeholder.com/80?text=AI+1"
+            alt="AI 1"
+          />
+          <h4 class="font-semibold mb-1 text-secondary">AI #1</h4>
+          <p class="text-sm text-gray-300 mb-2">Analysis Bot</p>
+          <p class="text-xs text-center text-gray-400">
+            Specializes in scanning large data sets from user-submitted concerns.
+          </p>
+        </div>
+
+        <div
+          class="p-6 bg-[#2f2340] bg-opacity-70 rounded shadow-sm flex flex-col items-center"
+        >
+          <img
+            class="w-16 h-16 rounded-full mb-4 border-2 border-secondary"
+            src="https://via.placeholder.com/80?text=AI+2"
+            alt="AI 2"
+          />
+          <h4 class="font-semibold mb-1 text-secondary">AI #2</h4>
+          <p class="text-sm text-gray-300 mb-2">Diagnostics Bot</p>
+          <p class="text-xs text-center text-gray-400">
+            Evaluates skin types, common issues, and possible remedies.
+          </p>
+        </div>
+
+        <div
+          class="p-6 bg-[#2f2340] bg-opacity-70 rounded shadow-sm flex flex-col items-center"
+        >
+          <img
+            class="w-16 h-16 rounded-full mb-4 border-2 border-secondary"
+            src="https://via.placeholder.com/80?text=AI+3"
+            alt="AI 3"
+          />
+          <h4 class="font-semibold mb-1 text-secondary">AI #3</h4>
+          <p class="text-sm text-gray-300 mb-2">Recommendation Bot</p>
+          <p class="text-xs text-center text-gray-400">
+            Suggests product combos and specialized regimens based on synergy analysis.
+          </p>
+        </div>
+
+        <!-- Human Experts -->
+        <div
+          class="p-6 bg-[#2f2340] bg-opacity-70 rounded shadow-sm flex flex-col items-center"
+        >
+          <img
+            class="w-16 h-16 rounded-full mb-4 border-2 border-secondary"
+            src="https://via.placeholder.com/80?text=Dr+1"
+            alt="Human Expert 1"
+          />
+          <h4 class="font-semibold mb-1 text-secondary">Dr. Chloe</h4>
+          <p class="text-sm text-gray-300 mb-2">Dermatologist</p>
+          <p class="text-xs text-center text-gray-400">
+            Oversees final reviews, ensuring real-world relevance of AI suggestions.
+          </p>
+        </div>
+
+        <div
+          class="p-6 bg-[#2f2340] bg-opacity-70 rounded shadow-sm flex flex-col items-center"
+        >
+          <img
+            class="w-16 h-16 rounded-full mb-4 border-2 border-secondary"
+            src="https://via.placeholder.com/80?text=Dr+2"
+            alt="Human Expert 2"
+          />
+          <h4 class="font-semibold mb-1 text-secondary">Dr. Alex</h4>
+          <p class="text-sm text-gray-300 mb-2">Cosmetic Chemist</p>
+          <p class="text-xs text-center text-gray-400">
+            Blends science and safety to approve final regimen formulations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-auto py-4 border-t border-gray-700 bg-black bg-opacity-50">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <p class="text-sm text-gray-400">
+        &copy; 2025 DermaLab. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <!-- jQuery + jQuery UI (CDN) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+
+  <!-- Futuristic Tabs + Node Workflow JS -->
+  <script>
+    // The tabContents array defines what HTML goes into each tab.
+    // Index 0 is "The Trio" tab content, which includes #node-workflow.
+    const tabContents = [
+      // TAB #1: "The Trio"
+      `<div id="node-workflow">
+         <p class="p-2 text-sm">
+           Below is a node-based workflow illustrating how data (Patient Reports, Images, PDF)
+           is passed among our AI & Human experts.
+         </p>
+         <svg id="svg"></svg>
+       </div>`,
+      // TAB #2: "Human Experts"
+      "Learn about our 2 human experts who validate AI-driven insights and ensure real-world feasibility of the skincare advice.",
+      // TAB #3: "More Info"
+      "This tab could hold extra info, FAQ, or future expansions to the DermaLab system!"
+    ];
+
+    (function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      const content = document.querySelector('.content');
+
+      tabs.forEach((tab, idx) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          content.innerHTML = tabContents[idx] || "Content";
+
+          // If this is the "Trio" tab, initialize the node workflow
+          if (idx === 0) {
+            initNodeWorkflow();
+          }
+        });
+      });
+
+      // Show the first tab on load + init
+      content.innerHTML = tabContents[0];
+      initNodeWorkflow();
+    })();
+
+    /*******************************************************
+     * Node Workflow Code
+     * Updated container context:
+     *   #node-workflow now has no min-height, overflow: visible
+     * Updated positions:
+     *   Left Column (x=100):   PDF (y=100), Images (y=250), Report (y=400)
+     *   Middle Column:         userProxy (x=400, y=250), generalManager (x=700, y=250)
+     *   Right Column (x=900):  doctor (y=100), pharma (y=250), humanExpert (y=400)
+     *******************************************************/
+    function initNodeWorkflow() {
+      const svg = document.getElementById('svg');
+      if (!svg) return; // only if #node-workflow is actually present
+      svg.ns = svg.namespaceURI;
+
+      const mouse = {
+        currentInput: null,
+        createPath(a, b) {
+          // Cubic Bézier from a -> b
+          const diffX = b.x - a.x;
+          const diffY = b.y - a.y;
+          return (
+            "M" + a.x + "," + a.y +
+            " C" + (a.x + diffX * 0.67) + "," + a.y + " " +
+            (b.x - diffX * 0.67) + "," + b.y + " " +
+            b.x + "," + b.y
+          );
+        }
+      };
+
+      function getOffset(el) {
+        const offset = { top: el.offsetTop, left: el.offsetLeft };
+        if (el.offsetParent) {
+          const p = getOffset(el.offsetParent);
+          offset.top += p.top;
+          offset.left += p.left;
+        }
+        return offset;
+      }
+
+      const workflowEl = document.getElementById('node-workflow');
+      const wfOffset = getOffset(workflowEl);
+
+      window.onmousemove = function(e) {
+        if (mouse.currentInput) {
+          const inputPos = mouse.currentInput.getAttachPoint();
+          const pointerPos = {
+            x: e.pageX - wfOffset.left,
+            y: e.pageY - wfOffset.top
+          };
+          const pathStr = mouse.createPath(inputPos, pointerPos);
+          mouse.currentInput.path.setAttributeNS(null, 'd', pathStr);
+        }
+      };
+
+      window.onclick = function() {
+        if (mouse.currentInput) {
+          mouse.currentInput.path.removeAttribute('d');
+          if (mouse.currentInput.node) {
+            mouse.currentInput.node.detachInput(mouse.currentInput);
+          }
+          mouse.currentInput = null;
+        }
+      };
+
+      /*******************************************************
+       * Node / NodeInput classes
+       *******************************************************/
+      function Node(name) {
+        this.domElement = document.createElement('div');
+        this.domElement.classList.add('node');
+        this.domElement.setAttribute('title', name);
+
+        const outEl = document.createElement('span');
+        outEl.classList.add('output');
+        outEl.innerHTML = '&nbsp;';
+        this.domElement.appendChild(outEl);
+
+        this.inputs = [];
+        this.attachedPaths = [];
+
+        const that = this;
+        outEl.onclick = function(e) {
+          if (mouse.currentInput && !that.ownsInput(mouse.currentInput)) {
+            const temp = mouse.currentInput;
+            mouse.currentInput = null;
+            that.connectTo(temp);
+          }
+          e.stopPropagation();
+        };
+      }
+
+      function NodeInput(label) {
+        this.name = label;
+        this.node = null;
+        this.domElement = document.createElement('div');
+        this.domElement.innerHTML = label;
+        this.domElement.classList.add('connection', 'empty');
+
+        this.path = document.createElementNS(svg.ns, 'path');
+        svg.appendChild(this.path);
+
+        const that = this;
+        this.domElement.onclick = function(e) {
+          // If another input was active, free it
+          if (mouse.currentInput) {
+            if (mouse.currentInput.path.hasAttribute('d')) {
+              mouse.currentInput.path.removeAttribute('d');
+            }
+            if (mouse.currentInput.node) {
+              mouse.currentInput.node.detachInput(mouse.currentInput);
+              mouse.currentInput.node = null;
+            }
+          }
+          mouse.currentInput = that;
+
+          // If already connected, detach from node
+          if (that.node) {
+            that.node.detachInput(that);
+            that.domElement.classList.remove('filled');
+            that.domElement.classList.add('empty');
+          }
+          e.stopPropagation();
+        };
+      }
+
+      NodeInput.prototype.getAttachPoint = function() {
+        const off = getOffset(this.domElement);
+        return {
+          x: off.left + this.domElement.offsetWidth - wfOffset.left - 2,
+          y: off.top + this.domElement.offsetHeight / 2 - wfOffset.top
+        };
+      };
+
+      Node.prototype.getOutputPoint = function() {
+        const circleEl = this.domElement.querySelector('.output');
+        const off = getOffset(circleEl);
+        return {
+          x: off.left + circleEl.offsetWidth / 2 - wfOffset.left,
+          y: off.top + circleEl.offsetHeight / 2 - wfOffset.top
+        };
+      };
+
+      Node.prototype.ownsInput = function(inp) {
+        return this.inputs.includes(inp);
+      };
+
+      Node.prototype.addInput = function(label) {
+        const inp = new NodeInput(label);
+        this.inputs.push(inp);
+        this.domElement.appendChild(inp.domElement);
+        return inp;
+      };
+
+      Node.prototype.connectTo = function(inp) {
+        inp.node = this;
+        this.domElement.classList.add('connected');
+        inp.domElement.classList.remove('empty');
+        inp.domElement.classList.add('filled');
+        this.attachedPaths.push({ input: inp, path: inp.path });
+
+        // Update path
+        const iPos = inp.getAttachPoint();
+        const oPos = this.getOutputPoint();
+        inp.path.setAttributeNS(null, 'd', mouse.createPath(iPos, oPos));
+      };
+
+      Node.prototype.detachInput = function(inp) {
+        let idx = -1;
+        for (let i = 0; i < this.attachedPaths.length; i++) {
+          if (this.attachedPaths[i].input === inp) {
+            idx = i;
+            break;
+          }
+        }
+        if (idx >= 0) {
+          this.attachedPaths[idx].path.removeAttribute('d');
+          this.attachedPaths[idx].input.node = null;
+          this.attachedPaths.splice(idx, 1);
+        }
+        if (this.attachedPaths.length === 0) {
+          this.domElement.classList.remove('connected');
+        }
+      };
+
+      Node.prototype.updatePosition = function() {
+        // Re-draw connections from this node
+        const oPos = this.getOutputPoint();
+        for (let i = 0; i < this.attachedPaths.length; i++) {
+          const inp = this.attachedPaths[i].input;
+          const iPos = inp.getAttachPoint();
+          this.attachedPaths[i].path.setAttributeNS(
+            null,
+            'd',
+            mouse.createPath(iPos, oPos)
+          );
+        }
+        // Re-draw connections into this node
+        for (let j = 0; j < this.inputs.length; j++) {
+          if (this.inputs[j].node) {
+            const iPos = this.inputs[j].getAttachPoint();
+            const theirO = this.inputs[j].node.getOutputPoint();
+            this.inputs[j].path.setAttributeNS(
+              null,
+              'd',
+              mouse.createPath(iPos, theirO)
+            );
+          }
+        }
+      };
+
+      Node.prototype.moveTo = function(pt) {
+        this.domElement.style.top = pt.y + 'px';
+        this.domElement.style.left = pt.x + 'px';
+        this.updatePosition();
+      };
+
+      Node.prototype.initUI = function() {
+        const that = this;
+        $(this.domElement).draggable({
+          containment: '#node-workflow',
+          cancel: '.connection,.output',
+          drag: function() {
+            that.updatePosition();
+          }
+        });
+        workflowEl.appendChild(this.domElement);
+        this.updatePosition();
+      };
+
+      /********** Define the actual nodes **********/
+      const patientPDF       = new Node("Patient PDF");
+      const patientImages    = new Node("Patient Images");
+      const patientReport    = new Node("Patient Report");
+      const userProxy        = new Node("User Proxy");
+      const generalManager   = new Node("General Manager");
+      const doctor           = new Node("Doctor");
+      const pharmaPerson     = new Node("Pharma Person");
+      const humanExpertProxy = new Node("Human Expert Proxy");
+
+      // User Proxy inputs
+      userProxy.addInput("Report");
+      userProxy.addInput("Images");
+      userProxy.addInput("PDF");
+
+      // General Manager inputs
+      generalManager.addInput("From User Proxy");
+      generalManager.addInput("From Doctor");
+      generalManager.addInput("From Pharma");
+      generalManager.addInput("From H. Expert");
+
+      // Doctor, Pharma, Human Expert
+      doctor.addInput("From GM");
+      pharmaPerson.addInput("From GM");
+      humanExpertProxy.addInput("From GM");
+      humanExpertProxy.addInput("Feedback from Doctor");
+
+      // Connections
+      patientReport.connectTo(userProxy.inputs[0]);
+      patientImages.connectTo(userProxy.inputs[1]);
+      patientPDF.connectTo(userProxy.inputs[2]);
+
+      userProxy.connectTo(generalManager.inputs[0]);
+      generalManager.connectTo(doctor.inputs[0]);
+      generalManager.connectTo(pharmaPerson.inputs[0]);
+      generalManager.connectTo(humanExpertProxy.inputs[0]);
+
+      doctor.connectTo(generalManager.inputs[1]);
+      pharmaPerson.connectTo(generalManager.inputs[2]);
+      humanExpertProxy.connectTo(generalManager.inputs[3]);
+
+      // doctor => humanExpert for feedback
+      doctor.connectTo(humanExpertProxy.inputs[1]);
+
+      /********** Updated positions per your request **********/
+      // Left Column (x=100), 150px vertical spacing
+      patientPDF.moveTo({    x: 100, y: 100 });
+      patientImages.moveTo({ x: 100, y: 250 });
+      patientReport.moveTo({ x: 100, y: 400 });
+
+      // Middle Column
+      userProxy.moveTo({      x: 400, y: 250 });
+      generalManager.moveTo({ x: 700, y: 250 });
+
+      // Right Column (x=900)
+      doctor.moveTo({           x: 900, y: 100 });
+      pharmaPerson.moveTo({     x: 900, y: 250 });
+      humanExpertProxy.moveTo({ x: 900, y: 400 });
+
+      // Initialize them
+      [
+        patientPDF,
+        patientImages,
+        patientReport,
+        userProxy,
+        generalManager,
+        doctor,
+        pharmaPerson,
+        humanExpertProxy
+      ].forEach(n => n.initUI());
+    }
+  </script>
+</body>
+</html>
